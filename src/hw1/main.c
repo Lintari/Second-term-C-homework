@@ -6,7 +6,7 @@ int main()
 {
 
     FILE* input = fopen("input.csv", "r");
-    if (file == NULL) {
+    if (input == NULL) {
         printf("не удалось создать input.csv \n");
         return 1;
     }
@@ -14,7 +14,7 @@ int main()
     FILE* output = fopen("output.txt", "w");
     if (output == NULL) {
         printf("не удалось создать output.txt\n");
-        fclose(file);
+        fclose(input);
         return 1;
     }
     fshow(input, output);
