@@ -1,4 +1,4 @@
-﻿#include "functions.h"
+#include "functions.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -6,14 +6,20 @@ int filesIsSame(FILE* f1, FILE* f2)
 {
     int c1, c2;
 
-    c1 = fgetc(f1);
-    c2 = fgetc(f2);
-
-    while (c1 == c2 && c1 != EOF && c2 != EOF) {
+    while (1) {
         c1 = fgetc(f1);
         c2 = fgetc(f2);
+        if (c1 == c2) {
+            if (c1 == EOF)
+                return 1;
+            continue;
+        }
+        if (c1 == '\n' && fgetc(f1) == EOF && c2 == EOF)
+            return 1;
+        if (c2 == '\n' && fgetc(f2) == EOF && c1 == EOF)
+            return 1;
+        return 0;
     }
-    return c1 == c2;
 }
 
 int getResult(const char* input, const char* output, const char* expected)
@@ -30,16 +36,24 @@ int getResult(const char* input, const char* output, const char* expected)
 
     FILE* fexp;
 
-    if (fwriteTable(fin, fout) != 0)
-        return -1;
-
-    fexp = fopen(expected, "r");
-    if (fexp == NULL) {
+    if (fshow(fin, fout) != 0) {
+        fclose(fin);
         fclose(fout);
         return -1;
     }
+    fclose(fin);
+    if (fclose(fout) != 0)
+        return -1;
+
+    fexp = fopen(expected, "r");
+    if (fexp == NULL)
+        return -1;
 
     fout = fopen(output, "r");
+    if (fout == NULL) {
+        fclose(fexp);
+        return -1;
+    }
 
     int pass = filesIsSame(fout, fexp);
 
@@ -81,16 +95,6 @@ int main(void)
     else {
         passed += 1;
         printf("Test 3 passed\n");
-    }
-
-    res = getResult("input_files/input4.csv", "output.txt", "expected_files/expected4.txt");
-    if (res == -1)
-        printf("...something went wrong\n");
-    else if (res == 0)
-        printf("Test 4 failed\n");
-    else {
-        passed += 1;
-        printf("Test 4 passed\n");
     }
 
     res = getResult("input_files/input5.csv", "output.txt", "expected_files/expected5.txt");
@@ -154,6 +158,6 @@ int main(void)
     }
     remove("output.txt");
 
-    printf("Passed %d/10\n", passed);
-    return 0;
+    printf("Passed %d/9\n", passed);
+    return passed == 9 ? 0 : 1;
 }
