@@ -80,7 +80,7 @@ int fdraw(FILE* input, FILE* out, int* count, int size)
         if (!istitle) {
             fplus(out, count, size, 0);
         }
-    
+
         if (istitle) {
             fplus(out, count, size, 1);
         }
