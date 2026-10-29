@@ -1,1 +1,1 @@
-add_executable(stub main.c)
+﻿add_subdirectory(hw1)
