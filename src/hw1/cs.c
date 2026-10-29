@@ -8,7 +8,7 @@
 #define MAX_COLS 256
 #define MAX_ROWS 10000
 
-int fplus(FILE* out, int* count, int size, int title)
+int fplus(FILE* out, const int* count, int size, int title)
 {
     char symbol = title ? '=' : '-'; // первые два раза у нас = а потом -
 
@@ -22,7 +22,7 @@ int fplus(FILE* out, int* count, int size, int title)
     return 0;
 }
 
-static int is_number(const char* text)
+static int isNumber(const char* text)
 {
     char* end;
 
@@ -52,7 +52,7 @@ static void frow(FILE* out, char* line, const int* count, int size, int title) /
         if (comma != NULL) {
             *comma = '\0';
         }
-        int ifnum = !title && is_number(field);
+        int ifnum = !title && isNumber(field);
         if (ifnum) {
             fprintf(out, "| %*s ", count[column], field); // отцентровали как надо по условию
         } else {
