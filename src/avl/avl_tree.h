@@ -16,12 +16,12 @@ typedef struct {
     size_t size;
 } AVLTree;
 
-void avl_tree_init(AVLTree* tree);
+void avlTreeInit(AVLTree* tree);
 
-bool avl_insert(AVLTree* tree, const char* iata_code, const char* name);
+bool avlInsert(AVLTree* tree, const char* iataCode, const char* name);
 
-const AVLNode* avl_find(const AVLTree* tree, const char* iata_code);
+const AVLNode* avlFind(const AVLTree* tree, const char* iataCode);
 
-bool avl_delete(AVLTree* tree, const char* iata_code);
+bool avlDelete(AVLTree* tree, const char* iataCode);
 
-void avl_tree_delete(AVLTree* tree);
+void avlTreeDelete(AVLTree* tree);

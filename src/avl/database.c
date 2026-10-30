@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-bool database_load(AVLTree* tree, const char* filename)
+bool databaseLoad(AVLTree* tree, const char* filename)
 {
     if (tree == NULL || filename == NULL) {
         return false;
@@ -15,7 +15,7 @@ bool database_load(AVLTree* tree, const char* filename)
     }
 
     AVLTree loaded;
-    avl_tree_init(&loaded);
+    avlTreeInit(&loaded);
 
     char line[1024];
     bool success = true;
@@ -42,13 +42,13 @@ bool database_load(AVLTree* tree, const char* filename)
         }
 
         *separator = '\0';
-        const char* iata_code = line;
+        const char* iataCode = line;
         const char* name = separator + 1;
 
-        if (avl_find(&loaded, iata_code) != NULL) {
+        if (avlFind(&loaded, iataCode) != NULL) {
             continue;
         }
-        if (!avl_insert(&loaded, iata_code, name)) {
+        if (!avlInsert(&loaded, iataCode, name)) {
             success = false;
             break;
         }
@@ -60,11 +60,11 @@ bool database_load(AVLTree* tree, const char* filename)
     fclose(file);
 
     if (!success) {
-        avl_tree_delete(&loaded);
+        avlTreeDelete(&loaded);
         return false;
     }
 
-    avl_tree_delete(tree);
+    avlTreeDelete(tree);
     *tree = loaded;
     return true;
 }

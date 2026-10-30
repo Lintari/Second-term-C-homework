@@ -14,7 +14,7 @@
 
 enum { ITEM_COUNT = 96 };
 
-static int check_node(const AVLNode* node, const char* lower, const char* upper, size_t* count)
+static int checkNode(const AVLNode* node, const char* lower, const char* upper, size_t* count)
 {
     if (node == NULL) {
         return 0;
@@ -23,26 +23,26 @@ static int check_node(const AVLNode* node, const char* lower, const char* upper,
     CHECK(lower == NULL || strcmp(node->iata_code, lower) > 0);
     CHECK(upper == NULL || strcmp(node->iata_code, upper) < 0);
 
-    int left_height = check_node(node->left, lower, node->iata_code, count);
-    int right_height = check_node(node->right, node->iata_code, upper, count);
-    int expected_balance = right_height - left_height;
+    int leftHeight = checkNode(node->left, lower, node->iata_code, count);
+    int rightHeight = checkNode(node->right, node->iata_code, upper, count);
+    int expectedBalance = rightHeight - leftHeight;
 
-    CHECK(expected_balance >= -1 && expected_balance <= 1);
-    CHECK(node->balance == expected_balance);
+    CHECK(expectedBalance >= -1 && expectedBalance <= 1);
+    CHECK(node->balance == expectedBalance);
     (*count)++;
 
-    return (left_height > right_height ? left_height : right_height) + 1;
+    return (leftHeight > rightHeight ? leftHeight : rightHeight) + 1;
 }
 
-static void check_tree(const AVLTree* tree, size_t expected_size)
+static void checkTree(const AVLTree* tree, size_t expectedSize)
 {
     size_t count = 0;
-    check_node(tree->root, NULL, NULL, &count);
-    CHECK(count == expected_size);
-    CHECK(tree->size == expected_size);
+    checkNode(tree->root, NULL, NULL, &count);
+    CHECK(count == expectedSize);
+    CHECK(tree->size == expectedSize);
 }
 
-static void test_insert_rotations(void)
+static void testInsertRotations(void)
 {
     static const char* const cases[][3] = {
         { "C", "B", "A" }, // LL
@@ -53,20 +53,20 @@ static void test_insert_rotations(void)
 
     for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
         AVLTree tree;
-        avl_tree_init(&tree);
+        avlTreeInit(&tree);
 
         for (size_t j = 0; j < 3; ++j) {
-            CHECK(avl_insert(&tree, cases[i][j], cases[i][j]));
-            check_tree(&tree, j + 1);
+            CHECK(avlInsert(&tree, cases[i][j], cases[i][j]));
+            checkTree(&tree, j + 1);
         }
 
         CHECK(strcmp(tree.root->iata_code, "B") == 0);
-        avl_tree_delete(&tree);
+        avlTreeDelete(&tree);
         CHECK(tree.root == NULL && tree.size == 0);
     }
 }
 
-static unsigned int next_random(unsigned int* state)
+static unsigned int nextRandom(unsigned int* state)
 {
     *state = *state * 1103515245u + 12345u;
     return *state;
@@ -75,84 +75,84 @@ static unsigned int next_random(unsigned int* state)
 static void shuffle(int* values, size_t count, unsigned int* state)
 {
     for (size_t i = count; i > 1; --i) {
-        size_t j = next_random(state) % i;
+        size_t j = nextRandom(state) % i;
         int temp = values[i - 1];
         values[i - 1] = values[j];
         values[j] = temp;
     }
 }
 
-static void test_insert_find(void)
+static void testInsertFind(void)
 {
     AVLTree tree;
     int order[ITEM_COUNT];
-    unsigned int random_state = 7;
-    avl_tree_init(&tree);
+    unsigned int randomState = 7;
+    avlTreeInit(&tree);
 
-    CHECK(!avl_insert(&tree, NULL, "Invalid"));
-    CHECK(!avl_insert(&tree, "BAD", NULL));
-    CHECK(avl_find(&tree, NULL) == NULL);
-    CHECK(!avl_delete(&tree, NULL));
+    CHECK(!avlInsert(&tree, NULL, "Invalid"));
+    CHECK(!avlInsert(&tree, "BAD", NULL));
+    CHECK(avlFind(&tree, NULL) == NULL);
+    CHECK(!avlDelete(&tree, NULL));
 
     for (int i = 0; i < ITEM_COUNT; ++i) {
         order[i] = i;
     }
-    shuffle(order, ITEM_COUNT, &random_state);
+    shuffle(order, ITEM_COUNT, &randomState);
 
     for (size_t i = 0; i < ITEM_COUNT; ++i) {
         char code[16];
         char name[24];
         snprintf(code, sizeof(code), "K%03d", order[i]);
         snprintf(name, sizeof(name), "Airport %03d", order[i]);
-        CHECK(avl_insert(&tree, code, name));
-        check_tree(&tree, i + 1);
+        CHECK(avlInsert(&tree, code, name));
+        checkTree(&tree, i + 1);
     }
 
-    CHECK(!avl_insert(&tree, "K010", "Duplicate"));
+    CHECK(!avlInsert(&tree, "K010", "Duplicate"));
     CHECK(tree.size == ITEM_COUNT);
-    const AVLNode* existing = avl_find(&tree, "K010");
+    const AVLNode* existing = avlFind(&tree, "K010");
     CHECK(existing != NULL);
     CHECK(strcmp(existing->name, "Airport 010") == 0);
-    CHECK(avl_find(&tree, "missing") == NULL);
-    CHECK(!avl_delete(&tree, "missing"));
-    check_tree(&tree, ITEM_COUNT);
+    CHECK(avlFind(&tree, "missing") == NULL);
+    CHECK(!avlDelete(&tree, "missing"));
+    checkTree(&tree, ITEM_COUNT);
 
-    avl_tree_delete(&tree);
+    avlTreeDelete(&tree);
 }
 
-static void test_delete(void)
+static void testDelete(void)
 {
     AVLTree tree;
     int order[ITEM_COUNT];
-    unsigned int random_state = 19;
-    avl_tree_init(&tree);
+    unsigned int randomState = 19;
+    avlTreeInit(&tree);
 
     for (int i = 0; i < ITEM_COUNT; ++i) {
         order[i] = i;
     }
-    shuffle(order, ITEM_COUNT, &random_state);
+    shuffle(order, ITEM_COUNT, &randomState);
 
     for (size_t i = 0; i < ITEM_COUNT; ++i) {
         char code[16];
         char name[24];
         snprintf(code, sizeof(code), "K%03d", order[i]);
         snprintf(name, sizeof(name), "Airport %03d", order[i]);
-        CHECK(avl_insert(&tree, code, name));
+        CHECK(avlInsert(&tree, code, name));
     }
-    check_tree(&tree, ITEM_COUNT);
+    checkTree(&tree, ITEM_COUNT);
 
-    shuffle(order, ITEM_COUNT, &random_state);
+    shuffle(order, ITEM_COUNT, &randomState);
     for (size_t i = 0; i < ITEM_COUNT; ++i) {
         char code[16];
         snprintf(code, sizeof(code), "K%03d", order[i]);
-        CHECK(avl_delete(&tree, code));
-        check_tree(&tree, ITEM_COUNT - i - 1);
-        CHECK(avl_find(&tree, code) == NULL);
+        CHECK(avlDelete(&tree, code));
+        checkTree(&tree, ITEM_COUNT - i - 1);
+        CHECK(avlFind(&tree, code) == NULL);
     }
 
     CHECK(tree.root == NULL);
-    CHECK(!avl_delete(&tree, "K000"));
-    avl_tree_delete(&tree);
+    CHECK(!avlDelete(&tree, "K000"));
+    avlTreeDelete(&tree);
 }
 
 int main(int argc, char** argv)
@@ -160,11 +160,11 @@ int main(int argc, char** argv)
     CHECK(argc == 2);
 
     if (strcmp(argv[1], "rotations") == 0) {
-        test_insert_rotations();
+        testInsertRotations();
     } else if (strcmp(argv[1], "insert_find") == 0) {
-        test_insert_find();
+        testInsertFind();
     } else if (strcmp(argv[1], "delete") == 0) {
-        test_delete();
+        testDelete();
     } else {
         CHECK(false);
     }

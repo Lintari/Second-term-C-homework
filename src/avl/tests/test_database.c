@@ -12,42 +12,42 @@
         }                                                                        \
     } while (0)
 
-static void test_successful_load(void)
+static void testSuccessfulLoad(void)
 {
     AVLTree tree;
-    avl_tree_init(&tree);
+    avlTreeInit(&tree);
 
-    CHECK(avl_insert(&tree, "OLD", "Old record"));
-    CHECK(database_load(&tree, TEST_AIRPORTS_FILE));
+    CHECK(avlInsert(&tree, "OLD", "Old record"));
+    CHECK(databaseLoad(&tree, TEST_AIRPORTS_FILE));
     CHECK(tree.size == 4);
-    CHECK(avl_find(&tree, "OLD") == NULL);
-    const AVLNode* node = avl_find(&tree, "SVO");
+    CHECK(avlFind(&tree, "OLD") == NULL);
+    const AVLNode* node = avlFind(&tree, "SVO");
     CHECK(node != NULL);
     CHECK(strcmp(node->name, "Sheremetyevo Airport") == 0);
-    node = avl_find(&tree, "LED");
+    node = avlFind(&tree, "LED");
     CHECK(node != NULL);
     CHECK(strcmp(node->name, "Pulkovo: north terminal") == 0);
-    node = avl_find(&tree, "DUP");
+    node = avlFind(&tree, "DUP");
     CHECK(node != NULL);
     CHECK(strcmp(node->name, "First occurrence") == 0);
 
-    avl_tree_delete(&tree);
+    avlTreeDelete(&tree);
     CHECK(tree.root == NULL && tree.size == 0);
 }
 
-static void test_failed_load(void)
+static void testFailedLoad(void)
 {
     AVLTree tree;
-    avl_tree_init(&tree);
+    avlTreeInit(&tree);
 
-    CHECK(avl_insert(&tree, "KEEP", "Keep this record"));
-    CHECK(!database_load(&tree, ""));
+    CHECK(avlInsert(&tree, "KEEP", "Keep this record"));
+    CHECK(!databaseLoad(&tree, ""));
     CHECK(tree.size == 1);
-    const AVLNode* node = avl_find(&tree, "KEEP");
+    const AVLNode* node = avlFind(&tree, "KEEP");
     CHECK(node != NULL);
     CHECK(strcmp(node->name, "Keep this record") == 0);
 
-    avl_tree_delete(&tree);
+    avlTreeDelete(&tree);
     CHECK(tree.root == NULL && tree.size == 0);
 }
 
@@ -56,9 +56,9 @@ int main(int argc, char** argv)
     CHECK(argc == 2);
 
     if (strcmp(argv[1], "load") == 0) {
-        test_successful_load();
+        testSuccessfulLoad();
     } else if (strcmp(argv[1], "failure") == 0) {
-        test_failed_load();
+        testFailedLoad();
     } else {
         CHECK(false);
     }

@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static char* skip_spaces(char* text)
+static char* skipSpaces(char* text)
 {
     while (isspace((unsigned char)*text)) {
         text++;
@@ -13,7 +13,7 @@ static char* skip_spaces(char* text)
     return text;
 }
 
-static void print_help(void)
+static void printHelp(void)
 {
     puts("Commands:");
     puts("  find <IATA>          Find an airport by code");
@@ -33,11 +33,11 @@ int main(int argc, char** argv)
 
     const char* filename = argc == 2 ? argv[1] : "airports.txt";
     AVLTree tree;
-    avl_tree_init(&tree);
+    avlTreeInit(&tree);
 
-    if (!database_load(&tree, filename)) {
+    if (!databaseLoad(&tree, filename)) {
         fprintf(stderr, "Could not load airport database: %s\n", filename);
-        avl_tree_delete(&tree);
+        avlTreeDelete(&tree);
         return 1;
     }
 
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 
         line[strcspn(line, "\r\n")] = '\0';
 
-        char* command = skip_spaces(line);
+        char* command = skipSpaces(line);
         if (*command == '\0') {
             continue;
         }
@@ -64,11 +64,11 @@ int main(int argc, char** argv)
         }
         if (*args != '\0') {
             *args++ = '\0';
-            args = skip_spaces(args);
+            args = skipSpaces(args);
         }
 
         if (strcmp(command, "help") == 0) {
-            print_help();
+            printHelp();
         } else if (strcmp(command, "exit") == 0 || strcmp(command, "quit") == 0) {
             break;
         } else if (strcmp(command, "size") == 0) {
@@ -84,19 +84,19 @@ int main(int argc, char** argv)
             }
             if (*args != '\0') {
                 *args++ = '\0';
-                args = skip_spaces(args);
+                args = skipSpaces(args);
             }
 
             if (*code == '\0' || *args != '\0') {
                 printf("Usage: %s <IATA>\n", command);
             } else if (strcmp(command, "find") == 0) {
-                const AVLNode* node = avl_find(&tree, code);
+                const AVLNode* node = avlFind(&tree, code);
                 if (node == NULL) {
                     printf("Airport not found: %s\n", code);
                 } else {
                     printf("%s: %s\n", node->iata_code, node->name);
                 }
-            } else if (avl_delete(&tree, code)) {
+            } else if (avlDelete(&tree, code)) {
                 printf("Deleted: %s\n", code);
             } else {
                 printf("Airport not found: %s\n", code);
@@ -108,19 +108,19 @@ int main(int argc, char** argv)
             }
             if (*args != '\0') {
                 *args++ = '\0';
-                args = skip_spaces(args);
+                args = skipSpaces(args);
             }
 
-            size_t name_length = strlen(args);
-            while (name_length > 0 && isspace((unsigned char)args[name_length - 1])) {
-                args[--name_length] = '\0';
+            size_t nameLength = strlen(args);
+            while (nameLength > 0 && isspace((unsigned char)args[nameLength - 1])) {
+                args[--nameLength] = '\0';
             }
 
             if (*code == '\0' || *args == '\0') {
                 puts("Usage: add <IATA> <name>");
-            } else if (avl_find(&tree, code) != NULL) {
+            } else if (avlFind(&tree, code) != NULL) {
                 printf("Airport already exists: %s\n", code);
-            } else if (avl_insert(&tree, code, args)) {
+            } else if (avlInsert(&tree, code, args)) {
                 printf("Added: %s\n", code);
             } else {
                 puts("Could not add airport (memory allocation failed)");
@@ -130,6 +130,6 @@ int main(int argc, char** argv)
         }
     }
 
-    avl_tree_delete(&tree);
+    avlTreeDelete(&tree);
     return 0;
 }
