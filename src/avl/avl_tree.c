@@ -154,6 +154,7 @@ static AVLNode* rebalance(AVLNode* root, bool* heightShrank) // shrank bcz heigh
     return root;
 }
 
+// NOLINTNEXTLINE(misc-no-recursion): Removing the leftmost node is a recursive tree traversal.
 static AVLNode* removeMin(AVLNode* root, AVLNode** minNode, bool* heightShrank)
 {
     if (root->left == NULL) {
@@ -171,6 +172,7 @@ static AVLNode* removeMin(AVLNode* root, AVLNode** minNode, bool* heightShrank)
     return root;
 }
 
+// NOLINTNEXTLINE(misc-no-recursion): Recursive insertion follows one AVL search path.
 static AVLNode* insertRecursive(AVLNode* root, const char* iataCode, const char* name, bool* inserted, bool* heightGrew)
 {
     if (root == NULL) {
@@ -221,6 +223,7 @@ static AVLNode* insertRecursive(AVLNode* root, const char* iataCode, const char*
 
     return root;
 }
+// NOLINTNEXTLINE(misc-no-recursion): Recursive deletion follows one AVL search path.
 static AVLNode* deleteRecursive(AVLNode* root, const char* iataCode, bool* deleted, bool* heightShrank) // height sharnk is a check has height changed or no
 {
     if (root == NULL) {
@@ -347,6 +350,7 @@ bool avlDelete(AVLTree* tree, const char* iataCode)
     return deleted;
 }
 
+// NOLINTNEXTLINE(misc-no-recursion): Freeing a tree recursively visits both subtrees.
 static void freeSubtree(AVLNode* root)
 {
     if (root == NULL) {
@@ -379,5 +383,4 @@ void avlTreeInit(AVLTree* tree)
 
     tree->root = NULL;
     tree->size = 0;
-    return;
 }

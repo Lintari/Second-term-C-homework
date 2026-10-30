@@ -12,8 +12,9 @@
         }                                                                        \
     } while (0)
 
-enum { ITEM_COUNT = 96 };
+enum { ItemCount = 96 };
 
+// NOLINTNEXTLINE(misc-no-recursion): Validation computes child heights bottom-up.
 static int checkNode(const AVLNode* node, const char* lower, const char* upper, size_t* count)
 {
     if (node == NULL) {
@@ -44,19 +45,19 @@ static void checkTree(const AVLTree* tree, size_t expectedSize)
 
 static void testInsertRotations(void)
 {
-    static const char* const cases[][3] = {
+    static const char* const CASES[][3] = {
         { "C", "B", "A" }, // LL
         { "A", "B", "C" }, // RR
         { "C", "A", "B" }, // LR
         { "A", "C", "B" } // RL
     };
 
-    for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+    for (size_t i = 0; i < sizeof(CASES) / sizeof(CASES[0]); ++i) {
         AVLTree tree;
         avlTreeInit(&tree);
 
         for (size_t j = 0; j < 3; ++j) {
-            CHECK(avlInsert(&tree, cases[i][j], cases[i][j]));
+            CHECK(avlInsert(&tree, CASES[i][j], CASES[i][j]));
             checkTree(&tree, j + 1);
         }
 
@@ -85,7 +86,7 @@ static void shuffle(int* values, size_t count, unsigned int* state)
 static void testInsertFind(void)
 {
     AVLTree tree;
-    int order[ITEM_COUNT];
+    int order[ItemCount];
     unsigned int randomState = 7;
     avlTreeInit(&tree);
 
@@ -94,12 +95,12 @@ static void testInsertFind(void)
     CHECK(avlFind(&tree, NULL) == NULL);
     CHECK(!avlDelete(&tree, NULL));
 
-    for (int i = 0; i < ITEM_COUNT; ++i) {
+    for (int i = 0; i < ItemCount; ++i) {
         order[i] = i;
     }
-    shuffle(order, ITEM_COUNT, &randomState);
+    shuffle(order, ItemCount, &randomState);
 
-    for (size_t i = 0; i < ITEM_COUNT; ++i) {
+    for (size_t i = 0; i < ItemCount; ++i) {
         char code[16];
         char name[24];
         snprintf(code, sizeof(code), "K%03d", order[i]);
@@ -109,13 +110,13 @@ static void testInsertFind(void)
     }
 
     CHECK(!avlInsert(&tree, "K010", "Duplicate"));
-    CHECK(tree.size == ITEM_COUNT);
+    CHECK(tree.size == ItemCount);
     const AVLNode* existing = avlFind(&tree, "K010");
     CHECK(existing != NULL);
     CHECK(strcmp(existing->name, "Airport 010") == 0);
     CHECK(avlFind(&tree, "missing") == NULL);
     CHECK(!avlDelete(&tree, "missing"));
-    checkTree(&tree, ITEM_COUNT);
+    checkTree(&tree, ItemCount);
 
     avlTreeDelete(&tree);
 }
@@ -123,30 +124,30 @@ static void testInsertFind(void)
 static void testDelete(void)
 {
     AVLTree tree;
-    int order[ITEM_COUNT];
+    int order[ItemCount];
     unsigned int randomState = 19;
     avlTreeInit(&tree);
 
-    for (int i = 0; i < ITEM_COUNT; ++i) {
+    for (int i = 0; i < ItemCount; ++i) {
         order[i] = i;
     }
-    shuffle(order, ITEM_COUNT, &randomState);
+    shuffle(order, ItemCount, &randomState);
 
-    for (size_t i = 0; i < ITEM_COUNT; ++i) {
+    for (size_t i = 0; i < ItemCount; ++i) {
         char code[16];
         char name[24];
         snprintf(code, sizeof(code), "K%03d", order[i]);
         snprintf(name, sizeof(name), "Airport %03d", order[i]);
         CHECK(avlInsert(&tree, code, name));
     }
-    checkTree(&tree, ITEM_COUNT);
+    checkTree(&tree, ItemCount);
 
-    shuffle(order, ITEM_COUNT, &randomState);
-    for (size_t i = 0; i < ITEM_COUNT; ++i) {
+    shuffle(order, ItemCount, &randomState);
+    for (size_t i = 0; i < ItemCount; ++i) {
         char code[16];
         snprintf(code, sizeof(code), "K%03d", order[i]);
         CHECK(avlDelete(&tree, code));
-        checkTree(&tree, ITEM_COUNT - i - 1);
+        checkTree(&tree, ItemCount - i - 1);
         CHECK(avlFind(&tree, code) == NULL);
     }
 
