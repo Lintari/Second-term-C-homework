@@ -1,0 +1,5 @@
+SVO:Sheremetyevo Airport
+LED:Pulkovo: north terminal
+JFK:John F Kennedy International Airport
+DUP:First occurrence
+DUP:Second occurrence
